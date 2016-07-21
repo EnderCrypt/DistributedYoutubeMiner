@@ -61,7 +61,7 @@ public class Client extends ConnectionListener
 		{
 			while (!Thread.interrupted())
 			{
-				if (videoIDs.size() < 5)
+				if (videoIDs.size() < 20)
 				{
 					send(new NETP_Videos(10));
 				}

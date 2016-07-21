@@ -83,6 +83,7 @@ public abstract class ConnectionListener implements Runnable, Closeable
 		catch (Exception e)
 		{
 			System.out.println(IP + " Connection Broke: [" + e.getClass().getSimpleName() + "] " + e.getMessage());
+			e.printStackTrace();
 			try
 			{
 				close();

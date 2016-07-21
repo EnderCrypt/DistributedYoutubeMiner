@@ -238,7 +238,7 @@ public class DataCenter
 	 * attempts to link downloaded data to its videoID in the database
 	 * @param videoData
 	 */
-	protected static void addVideo(NETP_VideoData videoData)
+	protected synchronized static void addVideo(NETP_VideoData videoData)
 	{
 		// check that Videos has this videoID
 		try (PreparedStatement statement = connection.prepareStatement("SELECT ID FROM Videos WHERE VideoID=?"))

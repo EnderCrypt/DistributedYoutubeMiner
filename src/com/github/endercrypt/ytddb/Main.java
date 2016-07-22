@@ -51,6 +51,7 @@ public class Main
 		}
 	}
 
+	@SuppressWarnings("resource")
 	private static void connectTo(InetAddress address) throws IOException
 	{
 		Socket socket = null;

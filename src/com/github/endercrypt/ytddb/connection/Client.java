@@ -87,6 +87,7 @@ public class Client extends ConnectionListener
 						try
 						{
 							Thread.sleep(1000);
+							throw new IOException();
 						}
 						catch (InterruptedException e)
 						{

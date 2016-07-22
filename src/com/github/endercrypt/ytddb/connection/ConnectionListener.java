@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.github.endercrypt.ytddb.backend.BackendConnection;
 import com.github.endercrypt.ytddb.net.NETP_ConnectionException;
 
 public abstract class ConnectionListener implements Runnable, Closeable
@@ -55,7 +56,15 @@ public abstract class ConnectionListener implements Runnable, Closeable
 			System.out.println(IP + " Connection Broke: [" + e.getClass().getSimpleName() + "] " + e.getMessage());
 			try
 			{
-				send(new NETP_ConnectionException(e));
+				if (getClass().equals(BackendConnection.class))
+				{
+					send(new NETP_ConnectionException(e));
+				}
+				if (getClass().equals(Client.class))
+				{
+					System.err.println("An exception occured in this client, please report this to Magnus/EnderCrypt");
+					e.printStackTrace();
+				}
 				close();
 			}
 			catch (IOException ce)
@@ -104,6 +113,7 @@ public abstract class ConnectionListener implements Runnable, Closeable
 		}
 	}
 
+	@SuppressWarnings({ "unused", "unchecked" })
 	private <T extends Serializable> T convertObject(Class<?> receivedClass, Object receivedObject)
 	{
 		return (T) receivedObject;

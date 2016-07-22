@@ -24,8 +24,8 @@ public class Backend
 	{
 		while (true)
 		{
-			Socket socket = serverSocket.accept();
-			BackendConnection connection = new BackendConnection(socket);
+			@SuppressWarnings("resource") Socket socket = serverSocket.accept();
+			@SuppressWarnings("resource") BackendConnection connection = new BackendConnection(socket);
 			System.out.println("Received connection from " + connection.IP);
 			connection.startListening();
 			connections.add(connection);

@@ -24,14 +24,14 @@ public class BackendConnection extends ConnectionListener
 			public void onReceive(NETP_VideoData object)
 			{
 				DataCenter.addVideo(object);
-				Backend.receivedVideoData++;
+				Backend.app.receivedVideoData++;
 			}
 		});
 
 		setObjectListener(NETP_Videos.class, new ReceivedListener<NETP_Videos>()
 		{
 			@Override
-			public void onReceive(NETP_Videos object)
+			public void onReceive(NETP_Videos object) throws IOException
 			{
 				int toSend = object.videoIdRequest;
 				if (toSend > 0)
@@ -44,7 +44,7 @@ public class BackendConnection extends ConnectionListener
 				{
 					Set<String> videoIDs = new HashSet<>(Arrays.asList(object.videos));
 					DataCenter.removeExisting(videoIDs);
-					Backend.receivedRelatedVideos += videoIDs.size();
+					Backend.app.receivedRelatedVideos += videoIDs.size();
 					DataCenter.addVideoIDs(videoIDs);
 				}
 			}

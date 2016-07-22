@@ -11,13 +11,13 @@ public class Backend
 	private static ServerSocket serverSocket;
 	public static final Set<BackendConnection> connections = new HashSet<>();
 
-	public static int receivedVideoData = 0;
-	public static int receivedRelatedVideos = 0;
+	public static BackendApp app;
 
 	public static void init(int port) throws IOException
 	{
 		serverSocket = new ServerSocket(port);
-		new Thread(new BackendApp()).start();
+		app = new BackendApp();
+		new Thread(app).start();
 	}
 
 	public static void run() throws IOException

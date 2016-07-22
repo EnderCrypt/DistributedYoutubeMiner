@@ -15,6 +15,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.github.endercrypt.ytddb.BadWebpageException;
+import com.github.endercrypt.ytddb.net.NETP_ConnectionException;
 import com.github.endercrypt.ytddb.net.NETP_RemoveID;
 import com.github.endercrypt.ytddb.net.NETP_VideoData;
 import com.github.endercrypt.ytddb.net.NETP_Videos;
@@ -42,6 +43,16 @@ public class Client extends ConnectionListener
 				System.out.println("Received " + newIDs.size() + " new video ID's to download");
 			}
 		});
+		setObjectListener(NETP_ConnectionException.class, new ReceivedListener<NETP_ConnectionException>()
+		{
+			@Override
+			public void onReceive(NETP_ConnectionException object)
+			{
+				System.err.println("An exception occured in the server, which forced this connection to close");
+				System.err.println("Please report this error to Magnus/EnderCrypt");
+				object.exception.printStackTrace();
+			}
+		});
 	}
 
 	@Override
@@ -59,31 +70,38 @@ public class Client extends ConnectionListener
 		@Override
 		public void run()
 		{
-			while (!Thread.interrupted())
+			try
 			{
-				if (videoIDs.size() < 20)
+				while (!Thread.interrupted())
 				{
-					send(new NETP_Videos(10));
-				}
-				if (videoIDs.size() > 0)
-				{
-					processVideo(videoIDs.removeFirst());
-				}
-				else
-				{
-					try
+					if (videoIDs.size() < 20)
 					{
-						Thread.sleep(1000);
+						send(new NETP_Videos(10));
 					}
-					catch (InterruptedException e)
+					if (videoIDs.size() > 0)
 					{
-						throw new RuntimeException(e);
+						processVideo(videoIDs.removeFirst());
+					}
+					else
+					{
+						try
+						{
+							Thread.sleep(1000);
+						}
+						catch (InterruptedException e)
+						{
+							throw new RuntimeException(e);
+						}
 					}
 				}
 			}
+			catch (IOException e)
+			{
+				panic(e);
+			}
 		}
 
-		private void processVideo(String videoID)
+		private void processVideo(String videoID) throws IOException
 		{
 			String url = YOUTUBE_URL + videoID;
 			Connection connection = Jsoup.connect(url);

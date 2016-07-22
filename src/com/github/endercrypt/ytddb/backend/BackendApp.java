@@ -4,6 +4,9 @@ import com.github.endercrypt.ytddb.connection.ConnectionListener;
 
 public class BackendApp implements Runnable
 {
+	public int receivedVideoData = 0;
+	public int receivedRelatedVideos = 0;
+
 	@Override
 	public void run()
 	{
@@ -33,9 +36,9 @@ public class BackendApp implements Runnable
 		}
 		System.out.println(sb.toString());
 		// List gathered data
-		System.out.println("Received data about " + Backend.receivedVideoData + " videos");
-		Backend.receivedVideoData = 0;
-		System.out.println("Received " + Backend.receivedRelatedVideos + " related videos");
-		Backend.receivedRelatedVideos = 0;
+		System.out.println("Received data about " + receivedVideoData + " videos");
+		receivedVideoData = 0;
+		System.out.println("Received " + receivedRelatedVideos + " related videos");
+		receivedRelatedVideos = 0;
 	}
 }

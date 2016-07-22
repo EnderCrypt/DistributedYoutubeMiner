@@ -9,6 +9,8 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.github.endercrypt.ytddb.net.NETP_ConnectionException;
+
 public abstract class ConnectionListener implements Runnable, Closeable
 {
 	public final Socket socket;
@@ -18,6 +20,7 @@ public abstract class ConnectionListener implements Runnable, Closeable
 
 	private Thread socketListenerThread;
 	private Map<Class<?>, ReceivedListener<?>> receiveListeners = new HashMap<>();
+	private boolean connectionOnline = true;
 
 	public ConnectionListener(Socket socket) throws IOException
 	{
@@ -39,24 +42,39 @@ public abstract class ConnectionListener implements Runnable, Closeable
 		return socketListenerThread;
 	}
 
-	public void send(Serializable serializable)
+	public void send(Serializable serializable) throws IOException
 	{
-		try
+		objectOutputStream.writeObject(serializable);
+		objectOutputStream.flush();
+	}
+
+	protected void panic(Exception e)
+	{
+		if (connectionOnline)
 		{
-			objectOutputStream.writeObject(serializable);
-			objectOutputStream.flush();
-		}
-		catch (IOException e)
-		{
-			throw new RuntimeException(e);
+			System.out.println(IP + " Connection Broke: [" + e.getClass().getSimpleName() + "] " + e.getMessage());
+			try
+			{
+				send(new NETP_ConnectionException(e));
+				close();
+			}
+			catch (IOException ce)
+			{
+				// failed to close properly, ignored
+			}
 		}
 	}
 
 	@Override
 	public void close() throws IOException
 	{
-		socketListenerThread.interrupt();
-		socket.close();
+		if (connectionOnline)
+		{
+			System.out.println("Disconnected: " + IP);
+			connectionOnline = false;
+			socketListenerThread.interrupt();
+			socket.close();
+		}
 	}
 
 	@Override
@@ -71,8 +89,8 @@ public abstract class ConnectionListener implements Runnable, Closeable
 				ReceivedListener<?> receivedListener = receiveListeners.get(receivedClass);
 				if (receivedListener == null)
 				{
-					close();
-					throw new RuntimeException("Missing ReceiverListener for " + receivedClass.getName());
+					//close();
+					//throw new RuntimeException("Missing ReceiverListener for " + receivedClass.getName());
 				}
 				else
 				{
@@ -82,15 +100,7 @@ public abstract class ConnectionListener implements Runnable, Closeable
 		}
 		catch (Exception e)
 		{
-			System.out.println(IP + " Connection Broke: [" + e.getClass().getSimpleName() + "] " + e.getMessage());
-			try
-			{
-				close();
-			}
-			catch (IOException ce)
-			{
-				System.err.println("Error occured while trying to close a connection: " + ce.getMessage());
-			}
+			panic(e);
 		}
 	}
 

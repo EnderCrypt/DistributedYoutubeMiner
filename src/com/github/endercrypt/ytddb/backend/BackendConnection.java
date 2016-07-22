@@ -8,6 +8,7 @@ import java.util.Set;
 
 import com.github.endercrypt.ytddb.connection.ConnectionListener;
 import com.github.endercrypt.ytddb.connection.ReceivedListener;
+import com.github.endercrypt.ytddb.net.NETP_ConnectionException;
 import com.github.endercrypt.ytddb.net.NETP_RemoveID;
 import com.github.endercrypt.ytddb.net.NETP_VideoData;
 import com.github.endercrypt.ytddb.net.NETP_Videos;
@@ -58,6 +59,19 @@ public class BackendConnection extends ConnectionListener
 				DataCenter.remove(object.videoID);
 			}
 		});
+	}
+
+	@Override
+	protected void exceptionOccured(Exception e)
+	{
+		try
+		{
+			send(new NETP_ConnectionException(e));
+		}
+		catch (IOException ie)
+		{
+			// ignore
+		}
 	}
 
 	@Override

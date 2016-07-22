@@ -46,11 +46,12 @@ public class Client extends ConnectionListener
 		setObjectListener(NETP_ConnectionException.class, new ReceivedListener<NETP_ConnectionException>()
 		{
 			@Override
-			public void onReceive(NETP_ConnectionException object)
+			public void onReceive(NETP_ConnectionException object) throws IOException
 			{
 				System.err.println("An exception occured in the server, which forced this connection to close");
 				System.err.println("Please report this error to Magnus/EnderCrypt");
 				object.exception.printStackTrace();
+				close();
 			}
 		});
 	}
@@ -87,7 +88,6 @@ public class Client extends ConnectionListener
 						try
 						{
 							Thread.sleep(1000);
-							throw new IOException();
 						}
 						catch (InterruptedException e)
 						{

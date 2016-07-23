@@ -1,6 +1,7 @@
 package com.github.endercrypt.ytddb;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.net.ConnectException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -18,7 +19,7 @@ public class Main
 	private static final int PORT = 36963;
 	private static String DB_FILE = "YoutubeVideoData.db";
 
-	public static void main(String[] args) throws IOException, ClassNotFoundException, SQLException
+	public static void main(String[] args) throws IOException, ClassNotFoundException, SQLException, InterruptedException
 	{
 		String ip = null;
 		if (args.length == 1)
@@ -31,7 +32,16 @@ public class Main
 			System.out.println("Initializing SQL...");
 			Class.forName("org.sqlite.JDBC");
 			DataCenter.init(DriverManager.getConnection("jdbc:sqlite:" + DB_FILE));
-			Backend.init(PORT);
+			try
+			{
+				Backend.init(PORT);
+			}
+			catch (BindException e)
+			{
+				Thread.sleep(1);
+				System.err.println("ERROR, Port " + PORT + " already in use");
+				System.exit(0);
+			}
 			System.out.println("Running as server");
 			Backend.run();
 		}

@@ -27,8 +27,6 @@ public class NETP_VideoData implements Serializable
 	private String uploader;
 	private int length;
 
-	private transient JsonObject json;
-
 	public NETP_VideoData(String videoID, Document document) throws BadWebpageException
 	{
 		this.videoID = videoID;
@@ -47,7 +45,7 @@ public class NETP_VideoData implements Serializable
 		}
 		startLocation = startLocation + startMarker.length();
 		String jsonString = scriptTag.substring(startLocation, endLocation);
-		json = (JsonObject) new JsonParser().parse(jsonString);
+		JsonObject json = (JsonObject) new JsonParser().parse(jsonString);
 
 		this.views = json.getAsJsonObject("args").getAsJsonPrimitive("view_count").getAsLong();
 		try
@@ -104,11 +102,6 @@ public class NETP_VideoData implements Serializable
 		return length;
 	}
 
-	public JsonObject getJson()
-	{
-		return json;
-	}
-
 	public void setTitle(String title)
 	{
 		this.title = title;
@@ -142,11 +135,6 @@ public class NETP_VideoData implements Serializable
 	public void setLength(int length)
 	{
 		this.length = length;
-	}
-
-	public void setJson(JsonObject json)
-	{
-		this.json = json;
 	}
 
 	public double getLikeRatio()

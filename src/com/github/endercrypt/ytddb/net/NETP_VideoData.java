@@ -31,12 +31,13 @@ public class NETP_VideoData implements Serializable
 	public NETP_VideoData(String videoID, Document document) throws BadWebpageException
 	{
 		//System.out.println(document);
-		/*
-		if (document.select("#unavailable-message").size() > 0)
+
+		if (document.getElementById("player-unavailable").hasClass("hid") == false)
 		{
-			throw new VideoNotAvailable("The received data (from youtube) suggests that this miner may have been temporarily blocked by youtube, try again in 30-60 minutes");
+			Element unavailableMessage = document.getElementById("unavailable-message");
+			throw new VideoNotAvailable(unavailableMessage.html());
 		}
-		*/
+
 		/*
 		try
 		{
@@ -46,6 +47,7 @@ public class NETP_VideoData implements Serializable
 		{
 			e.printStackTrace();
 		}*/
+		//System.out.println("DEBUG: " + videoID);
 		this.videoID = videoID;
 		this.title = document.select("#eow-title").text();
 		Element descriptionElement = document.getElementById("eow-description");

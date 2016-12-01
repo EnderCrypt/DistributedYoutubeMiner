@@ -130,8 +130,10 @@ public class Client extends ConnectionListener
 			}
 			catch (VideoNotAvailable e)
 			{
-				System.err.println(e.getMessage());
-				System.exit(0);
+				// page status error
+				System.err.println("YT status error: " + e.getMessage());
+				send(new NETP_RemoveID(videoID));
+				return;
 			}
 			catch (BadWebpageException e)
 			{

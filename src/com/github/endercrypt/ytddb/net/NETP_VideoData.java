@@ -31,8 +31,8 @@ public class NETP_VideoData implements Serializable
 	public NETP_VideoData(String videoID, Document document) throws BadWebpageException
 	{
 		//System.out.println(document);
-
-		if (document.getElementById("player-unavailable").hasClass("hid") == false)
+		Element playerUnavailable = document.getElementById("player-unavailable");
+		if ((playerUnavailable != null) && (playerUnavailable.hasClass("hid") == false))
 		{
 			Element unavailableMessage = document.getElementById("unavailable-message");
 			throw new VideoNotAvailable(unavailableMessage.html());

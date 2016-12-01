@@ -56,7 +56,7 @@ public class BackendConnection extends ConnectionListener
 			@Override
 			public void onReceive(NETP_RemoveID object)
 			{
-				DataCenter.remove(object.videoID);
+				//DataCenter.remove(object.videoID); IGNORED currently
 			}
 		});
 	}

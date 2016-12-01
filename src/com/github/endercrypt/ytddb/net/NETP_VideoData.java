@@ -7,7 +7,8 @@ import java.sql.SQLException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import com.github.endercrypt.ytddb.BadWebpageException;
+import com.github.endercrypt.ytddb.exception.BadWebpageException;
+import com.github.endercrypt.ytddb.exception.VideoNotAvailable;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -29,6 +30,22 @@ public class NETP_VideoData implements Serializable
 
 	public NETP_VideoData(String videoID, Document document) throws BadWebpageException
 	{
+		//System.out.println(document);
+		/*
+		if (document.select("#unavailable-message").size() > 0)
+		{
+			throw new VideoNotAvailable("The received data (from youtube) suggests that this miner may have been temporarily blocked by youtube, try again in 30-60 minutes");
+		}
+		*/
+		/*
+		try
+		{
+			Files.write(Paths.get("output.html"), document.toString().getBytes(), StandardOpenOption.CREATE);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}*/
 		this.videoID = videoID;
 		this.title = document.select("#eow-title").text();
 		Element descriptionElement = document.getElementById("eow-description");
@@ -60,6 +77,18 @@ public class NETP_VideoData implements Serializable
 		}
 		this.uploader = document.select("#watch7-user-header > div > a").text();
 		this.length = json.getAsJsonObject("args").getAsJsonPrimitive("length_seconds").getAsInt();
+	}
+
+	private static String getStringBetween(String from, String start, String end) throws BadWebpageException
+	{
+		int startIndex = from.indexOf(start);
+		if (startIndex == -1)
+			throw new BadWebpageException("unable to find start: " + start);
+		startIndex += start.length();
+		int endindex = from.indexOf(end, startIndex);
+		if (endindex == -1)
+			throw new BadWebpageException("unable to find end: " + end);
+		return from.substring(startIndex, endindex);
 	}
 
 	public String getVideoID()

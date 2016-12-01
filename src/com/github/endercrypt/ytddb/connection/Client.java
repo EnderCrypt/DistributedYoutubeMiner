@@ -14,7 +14,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.github.endercrypt.ytddb.BadWebpageException;
+import com.github.endercrypt.ytddb.exception.BadWebpageException;
+import com.github.endercrypt.ytddb.exception.VideoNotAvailable;
 import com.github.endercrypt.ytddb.net.NETP_ConnectionException;
 import com.github.endercrypt.ytddb.net.NETP_RemoveID;
 import com.github.endercrypt.ytddb.net.NETP_VideoData;
@@ -126,6 +127,11 @@ public class Client extends ConnectionListener
 			try
 			{
 				videoData = new NETP_VideoData(videoID, document);
+			}
+			catch (VideoNotAvailable e)
+			{
+				System.err.println(e.getMessage());
+				System.exit(0);
 			}
 			catch (BadWebpageException e)
 			{

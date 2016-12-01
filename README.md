@@ -1,4 +1,4 @@
-# DistrubutedYoutubeMiner
+# DistributedYoutubeMiner
 
 This is a continuation of https://github.com/moforogue/YouTube-information-gatherer
 the application has been almost entirely rewritten as to split it into 2 parts

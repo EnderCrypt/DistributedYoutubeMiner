@@ -29,9 +29,7 @@ public class Main
 		InetAddress address = InetAddress.getLocalHost();
 		if (ip == null)
 		{
-			System.out.println("Initializing SQL...");
-			Class.forName("org.sqlite.JDBC");
-			DataCenter.init(DriverManager.getConnection("jdbc:sqlite:" + DB_FILE));
+			System.out.println("Running server app..");
 			try
 			{
 				Backend.init(PORT);
@@ -42,6 +40,9 @@ public class Main
 				System.err.println("ERROR, Port " + PORT + " already in use");
 				System.exit(0);
 			}
+			System.out.println("Initializing SQL...");
+			Class.forName("org.sqlite.JDBC");
+			DataCenter.init(DriverManager.getConnection("jdbc:sqlite:" + DB_FILE));
 			System.out.println("Running as server");
 			Backend.run();
 		}

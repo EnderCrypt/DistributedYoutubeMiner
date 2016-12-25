@@ -25,7 +25,7 @@ public class BackendConnection extends ConnectionListener
 			public void onReceive(NETP_VideoData object)
 			{
 				DataCenter.addVideo(object);
-				Backend.app.receivedVideoData++;
+				Backend.app.entry.receivedVideoData++;
 			}
 		});
 
@@ -44,9 +44,13 @@ public class BackendConnection extends ConnectionListener
 				if (object.videos != null)
 				{
 					Set<String> videoIDs = new HashSet<>(Arrays.asList(object.videos));
-					DataCenter.removeExisting(videoIDs);
-					Backend.app.receivedRelatedVideos += videoIDs.size();
-					DataCenter.addVideoIDs(videoIDs);
+					synchronized (this)
+					{
+						int removed = DataCenter.removeExisting(videoIDs);
+						Backend.app.entry.newReceivedRelatedVideos += videoIDs.size();
+						Backend.app.entry.oldReceivedRelatedVideos += removed;
+						DataCenter.addVideoIDs(videoIDs);
+					}
 				}
 			}
 		});
@@ -56,7 +60,7 @@ public class BackendConnection extends ConnectionListener
 			@Override
 			public void onReceive(NETP_RemoveID object)
 			{
-				//DataCenter.remove(object.videoID); // ignored at the moment
+				DataCenter.remove(object.videoID);
 			}
 		});
 	}

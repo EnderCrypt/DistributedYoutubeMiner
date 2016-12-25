@@ -33,6 +33,8 @@ public class DataCenter
 
 	private static Connection connection;
 
+	private static boolean ready = false;
+
 	/**
 	 * should be activated once, to initialise the connection to the database
 	 * @param connection
@@ -47,7 +49,13 @@ public class DataCenter
 			addVideoIDs(START_VIDEO);
 		}
 		currentRow = DataCenter.getCurrentRow() - 1;
+		ready = true;
 		System.out.println("Current row: " + currentRow);
+	}
+
+	public static boolean isReady()
+	{
+		return ready;
 	}
 
 	/**
@@ -129,8 +137,9 @@ public class DataCenter
 	 * accepts a set of VideoID's and remove the video id's of those who have already been downloaded in the database
 	 * @param videoIDs
 	 */
-	protected static void removeExisting(Set<String> videoIDs)
+	protected static int removeExisting(Set<String> videoIDs)
 	{
+		int removed = 0;
 		try (PreparedStatement statement = connection.prepareStatement("SELECT VideoID FROM Videos WHERE VideoID = ? LIMIT 1"))
 		{
 			Iterator<String> iter = videoIDs.iterator();
@@ -142,6 +151,7 @@ public class DataCenter
 				{
 					if (resultSet.next() == true)
 					{
+						removed++;
 						iter.remove();
 					}
 				}
@@ -151,6 +161,7 @@ public class DataCenter
 		{
 			throw new RuntimeException(e);
 		}
+		return removed;
 	}
 
 	/**
@@ -210,7 +221,7 @@ public class DataCenter
 	 */
 	protected static void addVideoIDs(String... videoIDs)
 	{
-		addVideoIDs(new HashSet<String>(Arrays.asList(videoIDs)));
+		addVideoIDs(new HashSet<>(Arrays.asList(videoIDs)));
 	}
 
 	/**
@@ -220,7 +231,9 @@ public class DataCenter
 	 */
 	protected static void addVideoIDs(Set<String> videoIDs)
 	{
-		try (PreparedStatement statement = connection.prepareStatement("INSERT INTO Videos (VideoID) VALUES (?)"))
+		// java.sql.SQLException: [SQLITE_CONSTRAINT]  Abort due to constraint violation (UNIQUE constraint failed: Videos.VideoID)
+		// temp fix
+		try (PreparedStatement statement = connection.prepareStatement("INSERT OR IGNORE INTO Videos (VideoID) VALUES (?)"))
 		{
 			for (String videoID : videoIDs)
 			{

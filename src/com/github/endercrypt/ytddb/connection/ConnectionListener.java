@@ -115,6 +115,9 @@ public abstract class ConnectionListener implements Runnable, Closeable
 		}
 	}
 
+	/**
+	 * @param receivedClass  
+	 */
 	@SuppressWarnings({ "unused", "unchecked" })
 	private <T extends Serializable> T convertObject(Class<?> receivedClass, Object receivedObject)
 	{

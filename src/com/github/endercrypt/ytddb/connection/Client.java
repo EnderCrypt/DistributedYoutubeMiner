@@ -15,6 +15,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.github.endercrypt.ytddb.exception.BadWebpageException;
+import com.github.endercrypt.ytddb.exception.DownloadFailedException;
 import com.github.endercrypt.ytddb.exception.VideoNotAvailable;
 import com.github.endercrypt.ytddb.net.NETP_ConnectionException;
 import com.github.endercrypt.ytddb.net.NETP_RemoveID;
@@ -72,30 +73,50 @@ public class Client extends ConnectionListener
 		@Override
 		public void run()
 		{
+			boolean videoRequestAllowed = true;
 			try
 			{
 				while (!Thread.interrupted())
 				{
-					if (videoIDs.size() < 5)
+					// request new id's if needed
+					if (videoIDs.size() <= 5)
 					{
-						send(new NETP_Videos(10));
-					}
-					if (videoIDs.size() > 0)
-					{
-						processVideo(videoIDs.removeFirst());
-					}
-					else
-					{
-						try
+						if (videoRequestAllowed == true)
 						{
+							send(new NETP_Videos(10));
+							videoRequestAllowed = false;
 							Thread.sleep(1000);
 						}
-						catch (InterruptedException e)
+						else
 						{
-							throw new RuntimeException(e);
+							System.out.println("Failed to request new video id's, as internet seems unstable?");
+							Thread.sleep(10000);
 						}
 					}
+					if (videoIDs.size() > 5)
+					{
+						// download video data
+						String videoID = videoIDs.removeFirst();
+						try
+						{
+							processVideo(videoID);
+							videoRequestAllowed = true;
+						}
+						catch (DownloadFailedException e)
+						{
+							System.err.println("Failed to download " + videoID + " (internet connection lost?)");
+							videoIDs.addFirst(videoID);
+							Thread.sleep(5000);
+						}
+					}
+
 				}
+			}
+			catch (
+
+			InterruptedException e)
+			{
+				e.printStackTrace();
 			}
 			catch (IOException e)
 			{
@@ -118,8 +139,7 @@ public class Client extends ConnectionListener
 			}
 			catch (IOException e)
 			{
-				// error trying to download the page, ignore
-				return;
+				throw new DownloadFailedException();
 			}
 
 			// parse document into video data
@@ -146,6 +166,7 @@ public class Client extends ConnectionListener
 			send(videoData);
 			String[] relatedVideos = getRelatedVideos(document);
 			send(new NETP_Videos(relatedVideos));
+			return;
 		}
 
 		private String[] getRelatedVideos(Document document)

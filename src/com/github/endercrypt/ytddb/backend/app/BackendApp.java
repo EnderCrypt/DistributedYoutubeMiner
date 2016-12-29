@@ -1,4 +1,4 @@
-package com.github.endercrypt.ytddb.backend;
+package com.github.endercrypt.ytddb.backend.app;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.function.Function;
 
+import com.github.endercrypt.ytddb.backend.Backend;
+import com.github.endercrypt.ytddb.backend.DataCenter;
 import com.github.endercrypt.ytddb.connection.ConnectionListener;
 import com.github.endercrypt.ytddb.gui.GuiFrame;
 
@@ -116,18 +118,15 @@ public class BackendApp implements Runnable
 		{
 			try
 			{
-				for (int i = 0; i < 10; i++)
+				printData();
+				synchronized (graph)
 				{
-					synchronized (graph)
-					{
-						graph.addFirst(entry);
-						entry = new Entry();
-						verifyGraph();
-					}
-					printData();
-					guiFrame.repaint();
-					Thread.sleep(1000);
+					graph.addFirst(entry);
+					entry = new Entry();
+					verifyGraph();
 				}
+				guiFrame.repaint();
+				Thread.sleep(1000);
 			}
 			catch (InterruptedException e)
 			{
